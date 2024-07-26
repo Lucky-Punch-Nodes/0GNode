@@ -1,0 +1,61 @@
+# Install Dependencies
+# Update and install dependencies
+sudo apt update
+sudo apt install -y build-essential git curl jq
+
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+
+# Clone Repositories
+# Clone the 0G testnet repository
+git clone https://github.com/0gproject/testnet.git
+cd testnet
+
+# Build and Configure the Storage Node
+# Build the storage node
+cargo build --release
+
+# Create the configuration file for storage node
+cat <<EOF > ~/.0g/config.toml
+[storage_node]
+rpc_endpoint = "http://127.0.0.1:26657"
+node_url = "tcp://127.0.0.1:26656"
+
+# Set Up the Storage KV
+# Clone the Storage KV repository
+git clone https://github.com/0gproject/storage-kv.git
+cd storage-kv
+
+# Build the storage kv
+cargo build --release
+
+# Configure storage kv
+cat <<EOF > ~/.0g/kv_config.toml
+[storage_kv]
+rpc_endpoint = "http://127.0.0.1:26657"
+blockchain_rpc_endpoint = "http://127.0.0.1:26657"
+contract_address = "0g1xyz..."
+node_url = "tcp://127.0.0.1:26656"
+
+# Start the Storage Node and KV Service
+# Start the storage node
+./target/release/storage-node --config ~/.0g/config.toml
+
+# Start the storage kv
+./target/release/storage-kv --config ~/.0g/kv_config.toml
+
+# Create and Configure Validator
+# Initialize the node
+./target/release/0g init <moniker> --chain-id testnet
+
+# Add a key for the validator
+./target/release/0g keys add lucky_punch
+
+# Create the validator
+./target/release/0g tx staking create-validator \
+  --amount 1000000uatom \
+  --pubkey $(./target/release/0g tendermint show-validator) \
+  --moniker "lucky_punch" \
+  --chain-id testnet \
+  --from lucky_punch
