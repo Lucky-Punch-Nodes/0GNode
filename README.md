@@ -6,4 +6,4 @@
 
 ## [Scan](https://testnet.0g.explorers.guru/validator/0gvaloper1au6gh7tsryyk7mwgvw9tn75xuwcs79y8dn9up9)
 
-## Docs
+## [Docs](https://github.com/Lucky-Punch-Nodes/0GNode/blob/main/Setup-0g)
